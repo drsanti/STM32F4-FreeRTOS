@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "OpenOCD",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/build/STM32F4_FREERTOS_EXAMPLE.elf",
+            "request": "launch",
+            "type": "cortex-debug",
+            "device": "STM32F4xxx",
+            "servertype": "openocd",
+            "interface": "swd",
+            "configFiles": [
+                "${workspaceRoot}/stm32f4discovery.cfg"
+            ]
+        }
+    ]
+}
+

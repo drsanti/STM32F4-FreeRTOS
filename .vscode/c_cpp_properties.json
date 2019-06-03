@@ -1,0 +1,31 @@
+{
+    "configurations": [
+        {
+            "name": "ARM GCC",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/Drivers/**",
+                "${workspaceFolder}/Inc/**",
+                "${workspaceFolder}/FreeRTOS/**",
+                "${workspaceFolder}/FreeRTOS/Source/**",
+                "${workspaceFolder}/FreeRTOS/Source/CMSIS_RTOS/**",
+                "${workspaceFolder}/FreeRTOS/Source/include/**",
+                "${workspaceFolder}/FreeRTOS/Source/portable/**",
+                "${workspaceFolder}/FreeRTOS/Source/portable/GCC/**",
+                "${workspaceFolder}/FreeRTOS/Source/portable/GCC/ARM_CM4F/**",
+                "${workspaceFolder}/FreeRTOS/Source/portable/MemMang/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.17763.0",
+            "compilerPath": "C:/Embedded/GNU Tools ARM Embedded/5.4 2016q3/bin/arm-none-eabi-gcc.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "${default}"
+        }
+    ],
+    "version": 4
+}
