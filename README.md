@@ -39,3 +39,10 @@ int main(void) {
     while(1);
 }
 ```
+
+** How to?**
+* Copy the code in Src/examples/*.c
+* Paste in Src/main.c
+* Run make -j8
+* Run make flash
+* Debug or Check the result on the board
