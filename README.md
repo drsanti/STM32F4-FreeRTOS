@@ -1,29 +1,41 @@
-{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "OpenOCD",
-            "cwd": "${workspaceRoot}",
-            "executable": "./build/STM32F4_FREERTOS_EXAMPLE.elf",
-            "request": "launch",
-            "type": "cortex-debug",
-            "device": "STM32F4xxx",
-            "servertype": "openocd",
-            "interface": "swd",
-            "configFiles": [
-                "${workspaceRoot}/stm32f4discovery.cfg"
-            ]
-        }
-    ]
+**main_ex00_init.c -- Getting Started**
+
+```c
+/*
+ ********************************************************************
+ *                     STM32F4xx based on FreeRTOS
+ ********************************************************************
+ * FileName:    main_ex00_init.c
+ * Description: Getting Started 
+ ********************************************************************
+ * Dr.Santi Nuratch
+ * Embedded Computing and Control Laboratory | INC@KMUTT
+ * 03 June, 2019
+ * ****************************************************************** 
+ */
+
+#include "system_utils.h"
+
+//!! Blue LED Blinking
+static void Task1(void* pvParameters) {
+	for (;;) {
+		vTaskDelay(200/portTICK_PERIOD_MS);
+        LED_Inv(LED_BLUE);
+	}
 }
 
+int main(void) {
 
+    //!! Initialize
+    System_Init();
 
+    //!! Create task
+    xTaskCreate(Task1, "Task_1", 128, NULL, tskIDLE_PRIORITY+1, NULL);
 
+    //!! Start scheduler
+    vTaskStartScheduler();
 
-Link:
-    http://www.justinmklam.com/posts/2017/10/vscode-debugger-setup/
-
-
-Run OpenOCD:
-    openocd -f board/stm32f4discovery.cfg
+    //!!
+    while(1);
+}
+```
