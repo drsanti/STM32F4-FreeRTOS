@@ -40,7 +40,7 @@ int main(void) {
 }
 ```
 
-** How to?**
+**How to?**
 * Copy the code in Src/examples/*.c
 * Paste in Src/main.c
 * Run make -j8
