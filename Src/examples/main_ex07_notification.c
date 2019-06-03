@@ -1,58 +1,73 @@
+/*
+ ********************************************************************
+ *                     STM32F4xx based on FreeRTOS
+ ********************************************************************
+ * FileName:    main_ex07_notification.c
+ * Description: Using xTaskNotifyGive(), ulTaskNotifyTake() and 
+ *              vTaskNotifyGiveFromISR()
+ ********************************************************************
+ * Dr.Santi Nuratch
+ * Embedded Computing and Control Laboratory | INC@KMUTT
+ * 03 June, 2019
+ * ****************************************************************** 
+ */
+
 #include "system_utils.h"
 
+//!! Task handles
 TaskHandle_t TaskHandle_1, TaskHandle_2, TaskHandle_3;
 
 //!! Sends notification to Task2
-static void Task1(void* pvParameters) {
+static void Task1( void* pvParameters ) {
     for (;;) {
-        LED_Inv(LED_GREEN);
-        xTaskNotifyGive(TaskHandle_2);
-        vTaskDelay(100/portTICK_PERIOD_MS);
+        LED_Inv( LED_GREEN );
+        xTaskNotifyGive( TaskHandle_2 );
+        vTaskDelay( 100/portTICK_PERIOD_MS );
 	}
 }
 
 //!! Waits notification from Task1
-static void Task2(void* pvParameters) {
+static void Task2( void* pvParameters ) {
     uint32_t notificationCount = 0;
     for (;;) {
-        notificationCount = ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
+        notificationCount = ulTaskNotifyTake( pdFALSE, portMAX_DELAY );
         //!! pdFALSE means the ulTaskNotifyTake not resets the notification counter
 
-        if(notificationCount > 0) {
+        if( notificationCount > 0 ) {
             LED_Inv(LED_RED);
         }
 
         //!! Add longer delay to allow the notification counter more than 1
-        vTaskDelay(2000/portTICK_PERIOD_MS);
+        vTaskDelay( 2000/portTICK_PERIOD_MS );
         if( notificationCount > 1 ) {
-            LED_Inv(LED_BLUE);    //!! Break on this line and check the  notificationCount
+            LED_Inv( LED_BLUE );    //!! Break on this line and check the  notificationCount
         }
 	}
 }
 
 
 //!! Waits notification from ISR
-static void Task3(void* pvParameters) {
+static void Task3( void* pvParameters ) {
     uint32_t notificationCount = 0;
     for (;;) {
-        notificationCount = ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
+        notificationCount = ulTaskNotifyTake( pdFALSE, portMAX_DELAY );
         //!! pdFALSE means the ulTaskNotifyTake not resets the notification counter
 
-        if(notificationCount > 0) {
-            LED_Inv(LED_ORANGE);
+        if( notificationCount > 0 ) {
+            LED_Inv( LED_ORANGE );
         }
 	}
 }
 
 //!! Sends notification to Task3
-void EXTI0_IRQHandler(void) {
-    if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
+void EXTI0_IRQHandler( void ) {
+    if( HAL_GPIO_ReadPin( GPIOA, GPIO_PIN_0 ) ) {
         
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         vTaskNotifyGiveFromISR( TaskHandle_3, &xHigherPriorityTaskWoken );
         portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
     }
-    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+    HAL_GPIO_EXTI_IRQHandler( GPIO_PIN_0 );
 }
 
 int main(void) {

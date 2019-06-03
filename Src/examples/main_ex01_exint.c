@@ -1,22 +1,37 @@
+/*
+ ********************************************************************
+ *                     STM32F4xx based on FreeRTOS
+ ********************************************************************
+ * FileName:    main_ex01_exint.c
+ * Description: External Interrupt 
+ ********************************************************************
+ * Dr.Santi Nuratch
+ * Embedded Computing and Control Laboratory | INC@KMUTT
+ * 03 June, 2019
+ * ****************************************************************** 
+ */
+
 #include "system_utils.h"
 
+//!! Blinks Blue-LED
 static void Task1(void* pvParameters) {
 	for (;;) {
 		vTaskDelay(200/portTICK_PERIOD_MS);
-        HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_15); //!! BLUE LED
+        LED_Inv(LED_BLUE);
 	}
 }
 
+//!! EXTI0 Toggles Red-LED
 void EXTI0_IRQHandler(void) {
-    if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
-        HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14); //!! RED LED
+    if( HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0 )) {
+        LED_Inv(LED_RED);
     }
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 }
 
 //!! Called by the HAL_GPIO_EXTI_IRQHandler()
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13); //!! ORANGE LED   
+    LED_Inv(LED_GREEN);
 }
 
 

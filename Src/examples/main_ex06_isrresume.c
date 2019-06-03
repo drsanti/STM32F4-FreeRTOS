@@ -1,28 +1,44 @@
+/*
+ ********************************************************************
+ *                     STM32F4xx based on FreeRTOS
+ ********************************************************************
+ * FileName:    main_ex06_isrresume.c
+ * Description: Resume suspended task from ISR
+ ********************************************************************
+ * Dr.Santi Nuratch
+ * Embedded Computing and Control Laboratory | INC@KMUTT
+ * 03 June, 2019
+ * ****************************************************************** 
+ */
+
 #include "system_utils.h"
 
+//!! Task handles
 TaskHandle_t TaskHandle_1, TaskHandle_2;
 
-static void Task1(void* pvParameters) {
+//!! Blinks Green-LED
+static void Task1( void* pvParameters ) {
     for (;;) {
-        LED_Inv(LED_GREEN);
-        vTaskDelay(100/portTICK_PERIOD_MS);
+        LED_Inv( LED_GREEN );
+        vTaskDelay( 100/portTICK_PERIOD_MS );
 	}
 }
 
-static void Task2(void* pvParameters) {
+//!! Will be resumed by ISR
+static void Task2( void* pvParameters ) {
     for (;;) {
-        vTaskSuspend(NULL);
-        LED_Inv(LED_RED);
+        vTaskSuspend( NULL );
+        LED_Inv( LED_RED );
 	}
 }
 
-
-void EXTI0_IRQHandler(void) {
-    if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)) {
-        BaseType_t isYieldRequired = xTaskResumeFromISR(TaskHandle_2);
+//!! Resumes the Task2
+void EXTI0_IRQHandler( void ) {
+    if( HAL_GPIO_ReadPin( GPIOA, GPIO_PIN_0 ) ) {
+        BaseType_t isYieldRequired = xTaskResumeFromISR( TaskHandle_2 );
         portYIELD_FROM_ISR( isYieldRequired );
     }
-    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+    HAL_GPIO_EXTI_IRQHandler( GPIO_PIN_0 );
 }
 
 

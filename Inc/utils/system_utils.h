@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 #include "stm32f4xx_hal.h"
-#include "main.h"
+//#include "main.h"
 #include "cmsis_os.h"
 
 #define LED_GREEN    ((uint16_t)0x1000 << 0) //GPIO_Pin_12 // Green LED connects to PD12

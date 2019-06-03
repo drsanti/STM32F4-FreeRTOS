@@ -1,7 +1,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
-#include "main.h"
+#include "stm32f4xx_hal.h"
 
 
 //!! GetIdleTaskMemory prototype (linked to static allocation support)

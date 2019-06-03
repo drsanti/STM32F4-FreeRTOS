@@ -1,10 +1,23 @@
+/*
+ ********************************************************************
+ *                     STM32F4xx based on FreeRTOS
+ ********************************************************************
+ * FileName:    main_ex00_init.c
+ * Description: Getting Started 
+ ********************************************************************
+ * Dr.Santi Nuratch
+ * Embedded Computing and Control Laboratory | INC@KMUTT
+ * 03 June, 2019
+ * ****************************************************************** 
+ */
 
 #include "system_utils.h"
 
+//!! Blue LED Blinking
 static void Task1(void* pvParameters) {
 	for (;;) {
 		vTaskDelay(200/portTICK_PERIOD_MS);
-        HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_15); //!! BLUE LED
+        LED_Inv(LED_BLUE);
 	}
 }
 

@@ -1,22 +1,38 @@
+/*
+ ********************************************************************
+ *                     STM32F4xx based on FreeRTOS
+ ********************************************************************
+ * FileName:    main_ex04_binsem.c
+ * Description: Binary Semaphore
+ ********************************************************************
+ * Dr.Santi Nuratch
+ * Embedded Computing and Control Laboratory | INC@KMUTT
+ * 03 June, 2019
+ * ****************************************************************** 
+ */
+
 #include "system_utils.h"
 
+//!! Semaphore
 SemaphoreHandle_t xBinSemaphore;
 
+//!! Gives semaphore to Task2
 static void Task1(void* pvParameters) {
     for (;;) {
-        LED_Inv(LED_BLUE);
-        xSemaphoreGive(xBinSemaphore);
-        vTaskDelay(1000/portTICK_PERIOD_MS);
+        LED_Inv( LED_BLUE );
+        xSemaphoreGive( xBinSemaphore );
+        vTaskDelay( 1000/portTICK_PERIOD_MS );
 	}
 }
 
+//!! Waits semaphore from Task1
 static void Task2(void* pvParameters) {
     for (;;) {
         
-        if(xSemaphoreTake(xBinSemaphore, portMAX_DELAY )) {
-            LED_Set(LED_GREEN);    
-            vTaskDelay(100/portTICK_PERIOD_MS);
-            LED_Clr(LED_GREEN);    
+        if( xSemaphoreTake( xBinSemaphore, portMAX_DELAY ) ) {
+            LED_Set( LED_GREEN );    
+            vTaskDelay( 100/portTICK_PERIOD_MS );
+            LED_Clr( LED_GREEN );    
         }
 	}
 }
