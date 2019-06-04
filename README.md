@@ -68,19 +68,19 @@ static void Task1( void* pvParameters ) {
 
     for (;;) {
 
+        //!! Will be resumed by ISR
         vTaskSuspend( NULL );
 
         if( !bypass ) {
-            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
             enable_timers[itmer_index] ^= 0x1;      //!! Toggle
             if(enable_timers[itmer_index] & 0x1) {  //!! Check
-                xTimerStartFromISR( xTimers[itmer_index], &xHigherPriorityTaskWoken );   
+                xTimerStart( xTimers[itmer_index],  portMAX_DELAY);   
             }
             else {
-                xTimerStopFromISR( xTimers[itmer_index], &xHigherPriorityTaskWoken );
+                xTimerStop( xTimers[itmer_index],  portMAX_DELAY);
                 LED_Clr(LEDs[itmer_index]);
             }
-            //!! Nect timer
+            //!! Next timer
             itmer_index = (itmer_index+1)%NUM_TIMERS;
 
             //!! by pass flag
@@ -125,7 +125,7 @@ int main(void) {
             }
         } 
 
-        //!! Enable timer. This variable is used in
+        //!! Enable timer. This variable is used in Task1
         enable_timers[x] = 1; 
     }
     
@@ -141,6 +141,7 @@ int main(void) {
     //!!
     while(1);
 }
+
 
 ```
 
