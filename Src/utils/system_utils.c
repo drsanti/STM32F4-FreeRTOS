@@ -1,3 +1,16 @@
+/*
+ ********************************************************************
+ *                     STM32F4xx based on FreeRTOS
+ ********************************************************************
+ * FileName:    system_utils.c
+ * Description: Utillity functions, declaration and etc.
+ ********************************************************************
+ * Dr.Santi Nuratch
+ * Embedded Computing and Control Laboratory | INC@KMUTT
+ * 03 June, 2019
+ * ****************************************************************** 
+ */
+
 #include "system_utils.h"
 
 TIM_HandleTypeDef htim2;
@@ -60,16 +73,10 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
-  /*Configure GPIO pin Output Level */
+  /* Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : PA0 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;//GPIO_MODE_IT_RISING_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PD12 PD13 PD14 PD15 */
+  /* Configure GPIO pins : PD12 PD13 PD14 PD15 */
   GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -82,9 +89,16 @@ void MX_GPIO_Init(void)
 }
 
 void ExInt_Init(void) {
-  //!!  EXTI interrupt init
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* Configure GPIO pin : PA0 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;//GPIO_MODE_IT_RISING_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  //!! EXTI0 interrupt init
   HAL_NVIC_SetPriority(EXTI0_IRQn, 15, 0);
-  //HAL_NVIC_SetPriority(EXTI0_IRQn, 7, 0);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 }
 
@@ -98,9 +112,6 @@ void MX_TIM2_Init(void){
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
 
-  /* USER CODE BEGIN TIM2_Init 1 */
-
-  /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 35999;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -135,9 +146,6 @@ void MX_TIM4_Init(void) {
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
 
-  /* USER CODE BEGIN TIM4_Init 1 */
-
-  /* USER CODE END TIM4_Init 1 */
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 35999;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -175,17 +183,7 @@ void System_Init(void) {
   //!! Initialize all configured peripherals
   MX_GPIO_Init();
 
-  //!! Timer2 and Timer4 Init
-  //MX_TIM2_Init();
-  //MX_TIM4_Init();
-
-  //!! Starts the TIM Base generation in interrupt mode
-  //HAL_TIM_Base_Start_IT(&htim2);
-  //HAL_TIM_Base_Start_IT(&htim4);
 }
-
-
-
 
 void LED_Set(uint16_t led_id) {
   HAL_GPIO_WritePin(GPIOD, led_id, GPIO_PIN_SET);
