@@ -95,7 +95,7 @@ int main(void) {
             "Timer",
             ( 50 * x ) + 100,           //!! timer period in ticks
             pdTRUE,                     //!! auto-reload
-            (void *)x,//( void * ) 0,   //!! number of times the timer has expired
+            (void *)x,//( void * ) 0,   //!! id/number of times the timer has expired
             vTimerCallback              //!! callback when it expires
         );
 
