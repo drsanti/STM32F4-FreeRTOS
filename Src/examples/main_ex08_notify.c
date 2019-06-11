@@ -61,7 +61,7 @@ void EXTI0_IRQHandler( void ) {
     static int i = 0;
     if( HAL_GPIO_ReadPin( GPIOA, GPIO_PIN_0 ) ) {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        xTaskNotifyFromISR( TaskHandle_2, LEDs[2+(i++)%2], eSetBits, &xHigherPriorityTaskWoken );
+        xTaskNotifyFromISR( TaskHandle_3, LEDs[2+(i++)%2], eSetBits, &xHigherPriorityTaskWoken );
         portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
     }
     HAL_GPIO_EXTI_IRQHandler( GPIO_PIN_0 );

@@ -1,115 +1,91 @@
 #include "system_utils.h"
 
-//!! Task Handle
-TaskHandle_t TaskHandle_1;
 
-//!! LEDs
-uint16_t LEDs[] = { LED_BLUE, LED_GREEN, LED_ORANGE, LED_RED };
-
-//!! Number of timers
-#define NUM_TIMERS 4
+int _tmr2_isr_flag = 0;
 
 
-//!! Array of timer handles
-TimerHandle_t xTimers[ NUM_TIMERS ];
+// 
+void TIM2_IRQHandler(void) {
+    _tmr2_isr_flag = 1;
+    HAL_TIM_IRQHandler(&htim2);
+}
 
-//!! Used to control start/stop of timers, see in Task1
-static int32_t enable_timers[NUM_TIMERS];
+typedef void (*tmrcallback)(unsigned short);
 
-//!! Timer callback function
-void vTimerCallback( TimerHandle_t xTimer ) {
 
-    //!! number of times this timer has expired is saved as the timer's ID
-    uint32_t ulCount = ( uint32_t ) pvTimerGetTimerID( xTimer );
+#define TIMER_CNT 5
 
-    if(1) {
-        LED_Inv(LEDs[ulCount]);
-    }
-    else {
-        ulCount++;
-        vTimerSetTimerID( xTimer, ( void * ) ulCount );
+unsigned short tmr_cnt[TIMER_CNT];  // Counter
+unsigned short tmr_cmp[TIMER_CNT];  // Compare ()
+unsigned char  tmr_rdy[TIMER_CNT];  // Ready
+
+unsigned char  tmr_enb[TIMER_CNT];  // Enable
+
+tmrcallback    tmr_cbk[TIMER_CNT];  // Callback functions
+
+
+void SoftwareTimer( void ) {
+    unsigned int i;
+    for( i=0; i<TIMER_CNT; i++ ) {
+
+        if( !tmr_enb[i] ) continue;
+        tmr_cnt[i]++;
+        if( tmr_cnt[i] >= tmr_cmp[i] ) {
+            tmr_cnt[i] = 0;         // Reset counter
+            tmr_rdy[i] = 1;         // Ready  
+        }    
+    }   
+}
+
+void SoftwareTimerInit(void) {
+    for( int i=0; i<TIMER_CNT; i++ ) {
+        tmr_cnt[i] = 0;  
+        tmr_cmp[i] = (i+1)*10;  // Test
+        tmr_rdy[i] = 0;   
+        tmr_enb[i] = 1; 
     }
 }
 
-//!! Waits ISR
-static void Task1( void* pvParameters ) {
+void SoftwareTimerCreate(int id, unsigned short period, tmrcallback cbk) {
+    tmr_cnt[id] = 0;  
+    tmr_cmp[id] = period;
+    tmr_rdy[id] = 0;   
+    tmr_enb[id] = 1; 
+    tmr_cbk[id] = cbk;
+}
+
+int LEDs[] = { LED_RED, LED_GREEN, LED_BLUE, LED_ORANGE };
+void TimerCallback(unsigned short tmr_id) {
+
+    if(tmr_id > 3) {
+        return;
+    }
     
-    static int16_t itmer_index = 0;
-    static int16_t bypass = 0;
-
-    for (;;) {
-
-        vTaskSuspend( NULL );
-
-        if( bypass == 0 ) {
-            
-            enable_timers[itmer_index] ^= 0x1;      //!! Toggle
-            if(enable_timers[itmer_index] & 0x1) {  //!! Check
-                xTimerStart( xTimers[itmer_index], 2000);   
-            }
-            else {
-                xTimerStop( xTimers[itmer_index], 2000);
-                LED_Clr(LEDs[itmer_index]);
-            }
-
-            //!! Nect timer
-            itmer_index = (itmer_index+1)%NUM_TIMERS;
-
-            //!! by pass flag
-            bypass = 1;
-        }
-        //!! Simple debouncing
-        vTaskDelay(200/portTICK_PERIOD_MS); 
-        bypass = 0;
-	}
+    LED_Inv(LEDs[tmr_id]);
 }
 
-//!! Resume Task1
-void EXTI0_IRQHandler( void ) {
-    if( HAL_GPIO_ReadPin( GPIOA, GPIO_PIN_0 ) ) {
-        BaseType_t isYieldRequired = xTaskResumeFromISR( TaskHandle_1 );
-        portYIELD_FROM_ISR( isYieldRequired );
-    }
-    HAL_GPIO_EXTI_IRQHandler( GPIO_PIN_0 );
-}
 
 int main(void) {
-
-    //!! Initialize
     System_Init();
+    Timer2_Init();
 
-    //!! Create timers
-    for( int x = 0; x < NUM_TIMERS; x++ ) {
-        xTimers[ x ] = xTimerCreate(
-            "Timer",
-            ( 50 * x ) + 100,           //!! timer period in ticks
-            pdTRUE,                     //!! auto-reload
-            (void *)x,//( void * ) 0,   //!! number of times the timer has expired
-            vTimerCallback              //!! callback when it expires
-        );
+    SoftwareTimerCreate( 0, 10, TimerCallback );
+    SoftwareTimerCreate( 1, 16, TimerCallback );
+    SoftwareTimerCreate( 2, 33, TimerCallback );
+    SoftwareTimerCreate( 3, 45, TimerCallback );
 
-        if( xTimers[ x ] == NULL ) {
-            //!! The timer was not created
+    while(1) {
+        if( _tmr2_isr_flag ) {
+            _tmr2_isr_flag = 0; // reset
+            SoftwareTimer();
         }
-        else {
-            if( xTimerStart( xTimers[ x ], 0 ) != pdPASS ) {
-                //!! The timer could not be set into the Active state 
+
+        for(int i=0; i<TIMER_CNT; i++) {
+            if( tmr_rdy [i] ) {
+                tmr_rdy[i] = 0;
+                tmr_cbk[i](i);
             }
-        } 
-
-        //!! Enable timer. This variable is used in
-        enable_timers[x] = 1; 
+        }
     }
-    
-    //!! Create task
-    xTaskCreate( Task1, "Task_1", 128, NULL, tskIDLE_PRIORITY+1, &TaskHandle_1 );
-    
-    //!! Initial External Interupt (User button)
-    ExInt_Init();
-
-    //!! Start scheduler
-    vTaskStartScheduler();
-
-    //!!
-    while(1);
+    return 1;
 }

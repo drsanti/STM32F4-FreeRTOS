@@ -1,3 +1,19 @@
+<<<<<<< HEAD
+=======
+/*
+ ********************************************************************
+ *                     STM32F4xx based on FreeRTOS
+ ********************************************************************
+ * FileName:    main_ex10_timer.c
+ * Description: Using software timer
+ ********************************************************************
+ * Dr.Santi Nuratch
+ * Embedded Computing and Control Laboratory | INC@KMUTT
+ * 04 June, 2019
+ * ****************************************************************** 
+ */
+
+>>>>>>> b704437058f3be329a6770383ba802686a1a9312
 #include "system_utils.h"
 
 //!! Task Handle
@@ -39,9 +55,11 @@ static void Task1( void* pvParameters ) {
 
     for (;;) {
 
+        //!! Will be resumed by ISR
         vTaskSuspend( NULL );
 
         if( !bypass ) {
+<<<<<<< HEAD
             
             enable_timers[itmer_index] ^= 0x1;      //!! Toggle
             if(enable_timers[itmer_index] & 0x1) {  //!! Check
@@ -53,6 +71,17 @@ static void Task1( void* pvParameters ) {
             }
 
             //!! Nect timer
+=======
+            enable_timers[itmer_index] ^= 0x1;      //!! Toggle
+            if(enable_timers[itmer_index] & 0x1) {  //!! Check
+                xTimerStart( xTimers[itmer_index],  portMAX_DELAY);   
+            }
+            else {
+                xTimerStop( xTimers[itmer_index],  portMAX_DELAY);
+                LED_Clr(LEDs[itmer_index]);
+            }
+            //!! Next timer
+>>>>>>> b704437058f3be329a6770383ba802686a1a9312
             itmer_index = (itmer_index+1)%NUM_TIMERS;
 
             //!! by pass flag
@@ -84,7 +113,7 @@ int main(void) {
             "Timer",
             ( 50 * x ) + 100,           //!! timer period in ticks
             pdTRUE,                     //!! auto-reload
-            (void *)x,//( void * ) 0,   //!! number of times the timer has expired
+            (void *)x,//( void * ) 0,   //!! id/number of times the timer has expired
             vTimerCallback              //!! callback when it expires
         );
 
@@ -97,7 +126,7 @@ int main(void) {
             }
         } 
 
-        //!! Enable timer. This variable is used in
+        //!! Enable timer. This variable is used in Task1
         enable_timers[x] = 1; 
     }
     
