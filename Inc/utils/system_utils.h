@@ -21,10 +21,10 @@ extern "C" {
 #include "stm32f4xx_hal.h"
 #include "cmsis_os.h"
 
-#define LED_GREEN    ((uint16_t)0x1000 << 0) //GPIO_Pin_12 // Green LED connects to PD12
-#define LED_ORANGE   ((uint16_t)0x1000 << 1) //GPIO_Pin_13 // Orange LED connects to PD13
-#define LED_RED      ((uint16_t)0x1000 << 2) //GPIO_Pin_14 // Red LED connects to PD14
-#define LED_BLUE     ((uint16_t)0x1000 << 3) //GPIO_Pin_15 // Blue LED connects to PD15
+#define LED_GREEN    ((uint16_t)0x1000 << 0)    //GPIO_Pin_12 // Green LED connects to PD12
+#define LED_ORANGE   ((uint16_t)0x1000 << 1)    //GPIO_Pin_13 // Orange LED connects to PD13
+#define LED_RED      ((uint16_t)0x1000 << 2)    //GPIO_Pin_14 // Red LED connects to PD14
+#define LED_BLUE     ((uint16_t)0x1000 << 3)    //GPIO_Pin_15 // Blue LED connects to PD15
 
 void System_Init(void);
 void SystemClock_Config(void);

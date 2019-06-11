@@ -1,15 +1,3 @@
-/*
- ********************************************************************
- *                     STM32F4xx based on FreeRTOS
- ********************************************************************
- * FileName:    main_ex06_isrresume.c
- * Description: Resume suspended task from ISR
- ********************************************************************
- * Dr.Santi Nuratch
- * Embedded Computing and Control Laboratory | INC@KMUTT
- * 03 June, 2019
- * ****************************************************************** 
- */
 
 #include "system_utils.h"
 

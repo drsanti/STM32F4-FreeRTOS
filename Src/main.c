@@ -1,16 +1,3 @@
-/*
- ********************************************************************
- *                     STM32F4xx based on FreeRTOS
- ********************************************************************
- * FileName:    main_ex10_timer.c
- * Description: Using software timer
- ********************************************************************
- * Dr.Santi Nuratch
- * Embedded Computing and Control Laboratory | INC@KMUTT
- * 03 June, 2019
- * ****************************************************************** 
- */
-
 #include "system_utils.h"
 
 //!! Task Handle
@@ -21,6 +8,7 @@ uint16_t LEDs[] = { LED_BLUE, LED_GREEN, LED_ORANGE, LED_RED };
 
 //!! Number of timers
 #define NUM_TIMERS 4
+
 
 //!! Array of timer handles
 TimerHandle_t xTimers[ NUM_TIMERS ];
@@ -53,16 +41,17 @@ static void Task1( void* pvParameters ) {
 
         vTaskSuspend( NULL );
 
-        if( !bypass ) {
-            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        if( bypass == 0 ) {
+            
             enable_timers[itmer_index] ^= 0x1;      //!! Toggle
             if(enable_timers[itmer_index] & 0x1) {  //!! Check
-                xTimerStartFromISR( xTimers[itmer_index], &xHigherPriorityTaskWoken );   
+                xTimerStart( xTimers[itmer_index], 2000);   
             }
             else {
-                xTimerStopFromISR( xTimers[itmer_index], &xHigherPriorityTaskWoken );
+                xTimerStop( xTimers[itmer_index], 2000);
                 LED_Clr(LEDs[itmer_index]);
             }
+
             //!! Nect timer
             itmer_index = (itmer_index+1)%NUM_TIMERS;
 
