@@ -2,84 +2,109 @@
  ********************************************************************
  *                     STM32F4xx based on FreeRTOS
  ********************************************************************
- * FileName:    main_ex10_timer.c
- * Description: Using software timer
+ * FileName:    main_ex11_countingsem.c
+ * Description: Using Counting Semaphore
+ *              "#define configUSE_COUNTING_SEMAPHORES 1" is required
  ********************************************************************
  * Dr.Santi Nuratch
  * Embedded Computing and Control Laboratory | INC@KMUTT
- * 03 June, 2019
+ * 11 June, 2019
  * ****************************************************************** 
  */
 
 #include "system_utils.h"
+#include <math.h>
 
 //!! Task Handle
-TaskHandle_t TaskHandle_1;
+TaskHandle_t TaskHandle_1, TaskHandle_2, TaskHandle_3;
 
-//!! LEDs
-uint16_t LEDs[] = { LED_BLUE, LED_GREEN, LED_ORANGE, LED_RED };
+//!! Used foe debugging
+TaskStatus_t xTaskDetails;
 
-//!! Number of timers
-#define NUM_TIMERS 4
+//!! Semaphore Handle
+SemaphoreHandle_t xSemaphore;
 
-//!! Array of timer handles
-TimerHandle_t xTimers[ NUM_TIMERS ];
+//!! Shared resource
+#define BUFFER_LENGTH 256
+float Buffer[BUFFER_LENGTH];
 
-//!! Used to control start/stop of timers, see in Task1
-static int32_t enable_timers[NUM_TIMERS];
+//!! Task1 will be resumed by ISR
+static void Task1( void* pvParameters ) {
+    static int32_t k = 0;
+    for (;;) {
 
-//!! Timer callback function
-void vTimerCallback( TimerHandle_t xTimer ) {
+        //!! Waiting for ISR
+        xSemaphoreTake( xSemaphore, portMAX_DELAY  );
 
-    //!! number of times this timer has expired is saved as the timer's ID
-    uint32_t ulCount = ( uint32_t ) pvTimerGetTimerID( xTimer );
+        //!! Will be resumed by Task2
+        vTaskSuspend( NULL );
 
-    if(1) {
-        LED_Inv(LEDs[ulCount]);
-    }
-    else {
-        ulCount++;
-        vTimerSetTimerID( xTimer, ( void * ) ulCount );
+        //!! Access the shared resource
+        LED_Set( LED_RED ); //!! Press the Blue button when the RED-Led on
+        for(int i=0; i<BUFFER_LENGTH; i++) {
+
+            Buffer[i] = sin(2.0f*(22.0f/7.0f)*(float)i/(float)BUFFER_LENGTH);
+
+            //!!
+            //!! If the higher proprity task (Task3) taks the semaphore here, 
+            //!! the priority of this task will be increased to the priority of higher proprity, the Task3
+            //!!
+
+            vTaskGetInfo( TaskHandle_1, &xTaskDetails, pdTRUE, eInvalid  );
+            if( xTaskDetails.uxCurrentPriority > xTaskDetails.uxBasePriority ) {
+                LED_Inv(LED_ORANGE);    //!! Break pont here
+            }
+            k=0; while(k++ < 50000);
+            
+        }
+        
+        LED_Clr( LED_RED );
+        xSemaphoreGive( xSemaphore );
+
+        //!! Simple debouncing
+        vTaskDelay(200/portTICK_PERIOD_MS); 
+	}
+}
+
+static void Task2( void* pvParameters ) {
+    static int32_t k = 0;
+    for(;;) {
+        LED_Inv(LED_GREEN);
+        k=0; while(k++ < 5000000);
+        //!! Resume the Task1
+        vTaskResume( TaskHandle_1 );
+        vTaskDelay(100/portTICK_PERIOD_MS); 
     }
 }
 
-//!! Waits ISR
-static void Task1( void* pvParameters ) {
-    
-    static int16_t itmer_index = 0;
-    static int16_t bypass = 0;
 
-    for (;;) {
+//!! Task3 waits for ISR
+static void Task3( void* pvParameters ) {
+    static int32_t k = 0;
+    for(;;) {
 
-        //!! Will be resumed by ISR
+        //!! Waits ISR
         vTaskSuspend( NULL );
 
-        if( !bypass ) {
-            enable_timers[itmer_index] ^= 0x1;      //!! Toggle
-            if(enable_timers[itmer_index] & 0x1) {  //!! Check
-                xTimerStart( xTimers[itmer_index],  portMAX_DELAY);   
-            }
-            else {
-                xTimerStop( xTimers[itmer_index],  portMAX_DELAY);
-                LED_Clr(LEDs[itmer_index]);
-            }
-            //!! Next timer
-            itmer_index = (itmer_index+1)%NUM_TIMERS;
+        //!! Wait Mutex from Task1
+        LED_Set(LED_BLUE);
+        xSemaphoreTake( xSemaphore, portMAX_DELAY  );
 
-            //!! by pass flag
-            bypass = 1;
+        for(int i=0; i<BUFFER_LENGTH; i++) {
+            Buffer[i] = sin(2.0f*(22.0f/7.0f)*(float)i/(float)BUFFER_LENGTH);
+            k=0; while(k++ < 25000);
         }
-        //!! Simple debouncing
-        vTaskDelay(200/portTICK_PERIOD_MS); 
-        bypass = 0;
-	}
+        LED_Clr(LED_BLUE);
+        xSemaphoreGive( xSemaphore );
+    }
 }
 
 //!! Resume Task1
 void EXTI0_IRQHandler( void ) {
     if( HAL_GPIO_ReadPin( GPIOA, GPIO_PIN_0 ) ) {
-        BaseType_t isYieldRequired = xTaskResumeFromISR( TaskHandle_1 );
-        portYIELD_FROM_ISR( isYieldRequired );
+        //!! Resume the Task2
+        BaseType_t xHigherPriorityTaskWoken = xTaskResumeFromISR( TaskHandle_3 );
+        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
     }
     HAL_GPIO_EXTI_IRQHandler( GPIO_PIN_0 );
 }
@@ -89,31 +114,19 @@ int main(void) {
     //!! Initialize
     System_Init();
 
-    //!! Create timers
-    for( int x = 0; x < NUM_TIMERS; x++ ) {
-        xTimers[ x ] = xTimerCreate(
-            "Timer",
-            ( 50 * x ) + 100,           //!! timer period in ticks
-            pdTRUE,                     //!! auto-reload
-            (void *)x,//( void * ) 0,   //!! number of times the timer has expired
-            vTimerCallback              //!! callback when it expires
-        );
+    //!! Create a mutex type semaphore
+    xSemaphore = xSemaphoreCreateMutex();
 
-        if( xTimers[ x ] == NULL ) {
-            //!! The timer was not created
-        }
-        else {
-            if( xTimerStart( xTimers[ x ], 0 ) != pdPASS ) {
-                //!! The timer could not be set into the Active state 
-            }
-        } 
-
-        //!! Enable timer. This variable is used in Task1
-        enable_timers[x] = 1; 
+    if( xSemaphore == NULL ) {
+        //!! Failed to create the mutex semaphore
     }
-    
+
+    xSemaphoreGive( xSemaphore );
+
     //!! Create task
     xTaskCreate( Task1, "Task_1", 128, NULL, tskIDLE_PRIORITY+1, &TaskHandle_1 );
+    xTaskCreate( Task2, "Task_2", 128, NULL, tskIDLE_PRIORITY+2, &TaskHandle_2 );
+    xTaskCreate( Task3, "Task_3", 128, NULL, tskIDLE_PRIORITY+3, &TaskHandle_3 );
     
     //!! Initial External Interupt (User button)
     ExInt_Init();

@@ -27,6 +27,7 @@
 #define configTIMER_QUEUE_LENGTH                4
 #define configTIMER_TASK_STACK_DEPTH            ((uint16_t)128)  
 #define configTIMER_TASK_PRIORITY               1      
+#define configUSE_TRACE_FACILITY                1
 //!!
 
 #define configUSE_PREEMPTION                     1
@@ -42,6 +43,7 @@
 #define configMAX_TASK_NAME_LEN                  ( 16 )
 #define configUSE_16_BIT_TICKS                   0
 #define configUSE_MUTEXES                        1
+#define configUSE_COUNTING_SEMAPHORES            1  //!! New added
 #define configQUEUE_REGISTRY_SIZE                8
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION  1
 
