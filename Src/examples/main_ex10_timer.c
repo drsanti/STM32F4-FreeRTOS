@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 /*
  ********************************************************************
  *                     STM32F4xx based on FreeRTOS
@@ -12,8 +10,6 @@
  * 04 June, 2019
  * ****************************************************************** 
  */
-
->>>>>>> b704437058f3be329a6770383ba802686a1a9312
 #include "system_utils.h"
 
 //!! Task Handle
@@ -59,19 +55,6 @@ static void Task1( void* pvParameters ) {
         vTaskSuspend( NULL );
 
         if( !bypass ) {
-<<<<<<< HEAD
-            
-            enable_timers[itmer_index] ^= 0x1;      //!! Toggle
-            if(enable_timers[itmer_index] & 0x1) {  //!! Check
-                xTimerStart( xTimers[itmer_index]);   
-            }
-            else {
-                xTimerStop( xTimers[itmer_index]);
-                LED_Clr(LEDs[itmer_index]);
-            }
-
-            //!! Nect timer
-=======
             enable_timers[itmer_index] ^= 0x1;      //!! Toggle
             if(enable_timers[itmer_index] & 0x1) {  //!! Check
                 xTimerStart( xTimers[itmer_index],  portMAX_DELAY);   
@@ -81,7 +64,6 @@ static void Task1( void* pvParameters ) {
                 LED_Clr(LEDs[itmer_index]);
             }
             //!! Next timer
->>>>>>> b704437058f3be329a6770383ba802686a1a9312
             itmer_index = (itmer_index+1)%NUM_TIMERS;
 
             //!! by pass flag
