@@ -3,13 +3,14 @@
  *                     STM32F4xx based on FreeRTOS
  ********************************************************************
  * FileName:    main_ex07_notification.c
- * Description: Using xTaskNotifyGive(), ulTaskNotifyTake() and 
+ * Description: Using xTaskNotifyGive(), ulTaskNotifyTake() and
  *              vTaskNotifyGiveFromISR()
  ********************************************************************
- * Dr.Santi Nuratch
+ * Asst.Prof.Dr.Santi Nuratch
  * Embedded Computing and Control Laboratory | INC@KMUTT
- * 03 June, 2019
- * ****************************************************************** 
+ * Initial: 03 June 2019
+ * Update:  23 Sebtember 2020
+ * ******************************************************************
  */
 
 #include "system_utils.h"
@@ -62,7 +63,7 @@ static void Task3( void* pvParameters ) {
 //!! Sends notification to Task3
 void EXTI0_IRQHandler( void ) {
     if( HAL_GPIO_ReadPin( GPIOA, GPIO_PIN_0 ) ) {
-        
+
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         vTaskNotifyGiveFromISR( TaskHandle_3, &xHigherPriorityTaskWoken );
         portYIELD_FROM_ISR( xHigherPriorityTaskWoken );

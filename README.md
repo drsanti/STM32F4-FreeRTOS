@@ -5,10 +5,10 @@
 
 
 # How to?
-* Copy the code in Src/examples/*.c
-* Paste in Src/main.c
-* Run make -j8
-* Run make flash
+* Copy the code in `Src/examples/*.c`
+* Paste in `Src/main.c`
+* Run `make -j8`
+* Run `make flash`
 * Debug or Check the result on the board
 
 
@@ -25,7 +25,7 @@
  * Dr.Santi Nuratch
  * Embedded Computing and Control Laboratory | INC@KMUTT
  * 03 June, 2019
- * ****************************************************************** 
+ * ******************************************************************
  */
 
 #include "system_utils.h"
@@ -62,7 +62,7 @@ void vTimerCallback( TimerHandle_t xTimer ) {
 
 //!! Waits ISR
 static void Task1( void* pvParameters ) {
-    
+
     static int16_t itmer_index = 0;
     static int16_t bypass = 0;
 
@@ -74,7 +74,7 @@ static void Task1( void* pvParameters ) {
         if( !bypass ) {
             enable_timers[itmer_index] ^= 0x1;      //!! Toggle
             if(enable_timers[itmer_index] & 0x1) {  //!! Check
-                xTimerStart( xTimers[itmer_index],  portMAX_DELAY);   
+                xTimerStart( xTimers[itmer_index],  portMAX_DELAY);
             }
             else {
                 xTimerStop( xTimers[itmer_index],  portMAX_DELAY);
@@ -87,7 +87,7 @@ static void Task1( void* pvParameters ) {
             bypass = 1;
         }
         //!! Simple debouncing
-        vTaskDelay(200/portTICK_PERIOD_MS); 
+        vTaskDelay(200/portTICK_PERIOD_MS);
         bypass = 0;
 	}
 }
@@ -121,17 +121,17 @@ int main(void) {
         }
         else {
             if( xTimerStart( xTimers[ x ], 0 ) != pdPASS ) {
-                //!! The timer could not be set into the Active state 
+                //!! The timer could not be set into the Active state
             }
-        } 
+        }
 
         //!! Enable timer. This variable is used in Task1
-        enable_timers[x] = 1; 
+        enable_timers[x] = 1;
     }
-    
+
     //!! Create task
     xTaskCreate( Task1, "Task_1", 128, NULL, tskIDLE_PRIORITY+1, &TaskHandle_1 );
-    
+
     //!! Initial External Interupt (User button)
     ExInt_Init();
 
@@ -144,4 +144,3 @@ int main(void) {
 
 
 ```
-

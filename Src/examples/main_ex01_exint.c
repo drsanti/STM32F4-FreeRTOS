@@ -3,12 +3,13 @@
  *                     STM32F4xx based on FreeRTOS
  ********************************************************************
  * FileName:    main_ex01_exint.c
- * Description: External Interrupt 
+ * Description: External Interrupt
  ********************************************************************
- * Dr.Santi Nuratch
+ * Asst.Prof.Dr.Santi Nuratch
  * Embedded Computing and Control Laboratory | INC@KMUTT
- * 03 June, 2019
- * ****************************************************************** 
+ * Initial: 03 June 2019
+ * Update:  23 Sebtember 2020
+ * ******************************************************************
  */
 
 #include "system_utils.h"
@@ -52,4 +53,3 @@ int main(void) {
     //!!
     while(1);
 }
-

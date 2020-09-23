@@ -3,13 +3,14 @@
  *                     STM32F4xx based on FreeRTOS
  ********************************************************************
  * FileName:    main_ex12_priorityinv.c
- * Description: Using Counting Mutex Semaphore to solve 
+ * Description: Using Counting Mutex Semaphore to solve
  *              the priority inversion problem
  ********************************************************************
- * Dr.Santi Nuratch
+ * Asst.Prof.Dr.Santi Nuratch
  * Embedded Computing and Control Laboratory | INC@KMUTT
- * 11 June, 2019
- * ****************************************************************** 
+ * Initial: 03 June 2019
+ * Update:  23 Sebtember 2020
+ * ******************************************************************
  */
 
 #include "system_utils.h"
@@ -46,7 +47,7 @@ static void Task1( void* pvParameters ) {
             Buffer[i] = sin(2.0f*(22.0f/7.0f)*(float)i/(float)BUFFER_LENGTH);
 
             //!!
-            //!! If the higher proprity task (Task3) taks the semaphore here, 
+            //!! If the higher proprity task (Task3) taks the semaphore here,
             //!! the priority of this task will be increased to the priority of higher proprity, the Task3
             //!!
 
@@ -55,14 +56,14 @@ static void Task1( void* pvParameters ) {
                 LED_Inv(LED_ORANGE);    //!! Break pont here
             }
             k=0; while(k++ < 50000);
-            
+
         }
-        
+
         LED_Clr( LED_RED );
         xSemaphoreGive( xSemaphore );
 
         //!! Simple debouncing
-        vTaskDelay(200/portTICK_PERIOD_MS); 
+        vTaskDelay(200/portTICK_PERIOD_MS);
 	}
 }
 
@@ -73,7 +74,7 @@ static void Task2( void* pvParameters ) {
         k=0; while(k++ < 5000000);
         //!! Resume the Task1
         vTaskResume( TaskHandle_1 );
-        vTaskDelay(100/portTICK_PERIOD_MS); 
+        vTaskDelay(100/portTICK_PERIOD_MS);
     }
 }
 
@@ -127,7 +128,7 @@ int main(void) {
     xTaskCreate( Task1, "Task_1", 128, NULL, tskIDLE_PRIORITY+1, &TaskHandle_1 );
     xTaskCreate( Task2, "Task_2", 128, NULL, tskIDLE_PRIORITY+2, &TaskHandle_2 );
     xTaskCreate( Task3, "Task_3", 128, NULL, tskIDLE_PRIORITY+3, &TaskHandle_3 );
-    
+
     //!! Initial External Interupt (User button)
     ExInt_Init();
 

@@ -5,10 +5,11 @@
  * FileName:    main_ex03_mutex.c
  * Description: Mutex Semaphore
  ********************************************************************
- * Dr.Santi Nuratch
+ * Asst.Prof.Dr.Santi Nuratch
  * Embedded Computing and Control Laboratory | INC@KMUTT
- * 03 June, 2019
- * ****************************************************************** 
+ * Initial: 03 June 2019
+ * Update:  23 Sebtember 2020
+ * ******************************************************************
  */
 
 #include "system_utils.h"
@@ -33,7 +34,7 @@ static void Task1( void* pvParameters ) {
             xSemaphoreGive( xMutexSem );
         }
         else {
-            //!! could not access the shared buffer    
+            //!! could not access the shared buffer
         }
 
         LED_Inv( LED_BLUE );
@@ -55,7 +56,7 @@ static void Task2( void* pvParameters ) {
             xSemaphoreGive( xMutexSem );  //!! Comment this line, and check what happen?
         }
         else {
-            //!! could not access the shared buffer  
+            //!! could not access the shared buffer
         }
 
         LED_Inv( LED_ORANGE );

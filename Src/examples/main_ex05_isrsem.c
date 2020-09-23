@@ -5,10 +5,11 @@
  * FileName:    main_ex05_isrsem.c
  * Description: Using SemaphoreGiveFromISR
  ********************************************************************
- * Dr.Santi Nuratch
+ * Asst.Prof.Dr.Santi Nuratch
  * Embedded Computing and Control Laboratory | INC@KMUTT
- * 03 June, 2019
- * ****************************************************************** 
+ * Initial: 03 June 2019
+ * Update:  23 Sebtember 2020
+ * ******************************************************************
  */
 
 #include "system_utils.h"
@@ -28,9 +29,9 @@ static void Task1( void* pvParameters ) {
 static void Task2( void* pvParameters ) {
     for (;;) {
         if( xSemaphoreTake( xBinSemaphore, portMAX_DELAY ) ) {
-            LED_Set( LED_GREEN );    
+            LED_Set( LED_GREEN );
             vTaskDelay( 100/portTICK_PERIOD_MS );
-            LED_Clr( LED_GREEN );    
+            LED_Clr( LED_GREEN );
         }
 	}
 }

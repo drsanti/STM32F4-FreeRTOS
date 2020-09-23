@@ -6,10 +6,11 @@
  * Description: Using xTaskNotify(), xTaskNotifyWait() and
  *              xTaskNotifyFromISR()
  ********************************************************************
- * Dr.Santi Nuratch
+ * Asst.Prof.Dr.Santi Nuratch
  * Embedded Computing and Control Laboratory | INC@KMUTT
- * 03 June, 2019
- * ****************************************************************** 
+ * Initial: 03 June 2019
+ * Update:  23 Sebtember 2020
+ * ******************************************************************
  */
 
 #include "system_utils.h"
@@ -37,7 +38,7 @@ static void Task2( void* pvParameters ) {
             0x00,           //!! Don't clear any notification bits on entry.
             0xffffffffUL,   //!! Reset the notification value to 0 on exit
             &notificationValue, portMAX_DELAY );
-        
+
         LED_Inv( notificationValue );
 	}
 }
@@ -51,7 +52,7 @@ static void Task3( void* pvParameters ) {
             0x00,           //!! Don't clear any notification bits on entry.
             0xffffffffUL,   //!! Reset the notification value to 0 on exit
             &notificationValue, portMAX_DELAY );
-        
+
         LED_Inv( notificationValue );
 	}
 }

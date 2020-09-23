@@ -1,19 +1,3 @@
-<<<<<<< HEAD
-=======
-/*
- ********************************************************************
- *                     STM32F4xx based on FreeRTOS
- ********************************************************************
- * FileName:    main_ex10_timer.c
- * Description: Using software timer
- ********************************************************************
- * Dr.Santi Nuratch
- * Embedded Computing and Control Laboratory | INC@KMUTT
- * 04 June, 2019
- * ****************************************************************** 
- */
-
->>>>>>> b704437058f3be329a6770383ba802686a1a9312
 #include "system_utils.h"
 
 //!! Task Handle
@@ -49,7 +33,7 @@ void vTimerCallback( TimerHandle_t xTimer ) {
 
 //!! Waits ISR
 static void Task1( void* pvParameters ) {
-    
+
     static int16_t itmer_index = 0;
     static int16_t bypass = 0;
 
@@ -59,11 +43,10 @@ static void Task1( void* pvParameters ) {
         vTaskSuspend( NULL );
 
         if( !bypass ) {
-<<<<<<< HEAD
-            
+
             enable_timers[itmer_index] ^= 0x1;      //!! Toggle
             if(enable_timers[itmer_index] & 0x1) {  //!! Check
-                xTimerStart( xTimers[itmer_index]);   
+                xTimerStart( xTimers[itmer_index]);
             }
             else {
                 xTimerStop( xTimers[itmer_index]);
@@ -71,24 +54,13 @@ static void Task1( void* pvParameters ) {
             }
 
             //!! Nect timer
-=======
-            enable_timers[itmer_index] ^= 0x1;      //!! Toggle
-            if(enable_timers[itmer_index] & 0x1) {  //!! Check
-                xTimerStart( xTimers[itmer_index],  portMAX_DELAY);   
-            }
-            else {
-                xTimerStop( xTimers[itmer_index],  portMAX_DELAY);
-                LED_Clr(LEDs[itmer_index]);
-            }
-            //!! Next timer
->>>>>>> b704437058f3be329a6770383ba802686a1a9312
             itmer_index = (itmer_index+1)%NUM_TIMERS;
 
             //!! by pass flag
             bypass = 1;
         }
         //!! Simple debouncing
-        vTaskDelay(200/portTICK_PERIOD_MS); 
+        vTaskDelay(200/portTICK_PERIOD_MS);
         bypass = 0;
 	}
 }
@@ -122,17 +94,17 @@ int main(void) {
         }
         else {
             if( xTimerStart( xTimers[ x ], 0 ) != pdPASS ) {
-                //!! The timer could not be set into the Active state 
+                //!! The timer could not be set into the Active state
             }
-        } 
+        }
 
         //!! Enable timer. This variable is used in Task1
-        enable_timers[x] = 1; 
+        enable_timers[x] = 1;
     }
-    
+
     //!! Create task
     xTaskCreate( Task1, "Task_1", 128, NULL, tskIDLE_PRIORITY+1, &TaskHandle_1 );
-    
+
     //!! Initial External Interupt (User button)
     ExInt_Init();
 

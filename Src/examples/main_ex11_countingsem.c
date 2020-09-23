@@ -6,10 +6,11 @@
  * Description: Using Counting Semaphore
  *              "#define configUSE_COUNTING_SEMAPHORES 1" is required
  ********************************************************************
- * Dr.Santi Nuratch
+ * Asst.Prof.Dr.Santi Nuratch
  * Embedded Computing and Control Laboratory | INC@KMUTT
- * 11 June, 2019
- * ****************************************************************** 
+ * Initial: 03 June 2019
+ * Update:  23 Sebtember 2020
+ * ******************************************************************
  */
 
 #include "system_utils.h"
@@ -33,7 +34,7 @@ static void Task1( void* pvParameters ) {
     for (;;) {
 
         //!! Waiting for ISR
-        
+
         xSemaphoreTake( xSemaphore, portMAX_DELAY  );
 
         //!! Flash the RED-LED
@@ -42,14 +43,14 @@ static void Task1( void* pvParameters ) {
         LED_Clr( LED_RED );
 
         //!! Simple debouncing
-        vTaskDelay(200/portTICK_PERIOD_MS); 
+        vTaskDelay(200/portTICK_PERIOD_MS);
 	}
 }
 
 static void Task2( void* pvParameters ) {
     UBaseType_t semCount;
     for(;;) {
-        semCount = uxSemaphoreGetCount( xSemaphore );    
+        semCount = uxSemaphoreGetCount( xSemaphore );
         if( semCount > 2 ) {
             LED_Set(LED_BLUE);
         }
@@ -89,7 +90,7 @@ int main(void) {
     //!! Create task
     xTaskCreate( Task1, "Task_1", 128, NULL, tskIDLE_PRIORITY+1, &TaskHandle_1 );
     xTaskCreate( Task2, "Task_2", 128, NULL, tskIDLE_PRIORITY+1, &TaskHandle_2 );
-    
+
     //!! Initial External Interupt (User button)
     ExInt_Init();
 
